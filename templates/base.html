@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Attendance System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h2>🎓 Attendance System</h2>
+            </div>
+            <div class="nav-links">
+                {% if session.get('user_id') %}
+                    {% if session.get('role') == 'student' %}
+                        <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('student_request') }}">New Request</a>
+                    {% elif session.get('role') == 'coordinator' %}
+                        <a href="{{ url_for('coordinator_dashboard') }}">Dashboard</a>
+                    {% elif session.get('role') == 'hod' %}
+                        <a href="{{ url_for('hod_dashboard') }}">Dashboard</a>
+                    {% endif %}
+                    <a href="{{ url_for('all_requests') }}">📋 All Requests</a>
+                    <span class="user-info">👤 {{ session.get('name') }} ({{ session.get('role')|upper }})</span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-logout">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('index') }}">Home</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                        <button class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Attendance Request System | Python-MySQL Project</p>
+        </div>
+    </footer>
+</body>
+</html>

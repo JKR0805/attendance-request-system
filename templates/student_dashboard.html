@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>📊 My Attendance Requests</h2>
+    <a href="{{ url_for('student_request') }}" class="btn btn-primary">
+        ➕ New Request
+    </a>
+</div>
+
+{% if requests %}
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Subject</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Submitted On</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr>
+                <td>#{{ req.request_id }}</td>
+                <td>{{ req.subject }}</td>
+                <td>{{ req.start_time|datetime }}</td>
+                <td>{{ req.end_time|datetime }}</td>
+                <td>
+                    <span class="status-badge status-{{ req.status }}">
+                        {% if req.status == 'pending' %}
+                            ⏳ Pending
+                        {% elif req.status == 'approved_by_coordinator' %}
+                            🔄 With HOD
+                        {% elif req.status == 'approved' %}
+                            ✅ Approved
+                        {% elif req.status == 'rejected' %}
+                            ❌ Rejected
+                        {% endif %}
+                    </span>
+                </td>
+                <td>{{ req.created_at|datetime }}</td>
+                <td>
+                    <a href="{{ url_for('view_request', request_id=req.request_id) }}" 
+                       class="btn btn-sm btn-info">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No Requests Yet</h3>
+    <p>You haven't submitted any attendance requests.</p>
+    <a href="{{ url_for('student_request') }}" class="btn btn-primary">
+        Submit Your First Request
+    </a>
+</div>
+{% endif %}
+
+<div class="info-box">
+    <h3>📌 Status Guide</h3>
+    <ul>
+        <li><span class="status-badge status-pending">⏳ Pending</span> - Waiting for coordinator review</li>
+        <li><span class="status-badge status-approved_by_coordinator">🔄 With HOD</span> - Coordinator approved, awaiting HOD review</li>
+        <li><span class="status-badge status-approved">✅ Approved</span> - Finally approved by HOD</li>
+        <li><span class="status-badge status-rejected">❌ Rejected</span> - Request was rejected</li>
+    </ul>
+</div>
+{% endblock %}

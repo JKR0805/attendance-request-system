@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Attendance System{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>🎓 Attendance Request & Approval System</h1>
+    <p class="subtitle">Streamline attendance permissions for students, coordinators, and HODs</p>
+</div>
+
+<div class="card-grid">
+    <div class="card">
+        <div class="card-icon">👨‍🎓</div>
+        <h3>Student Portal</h3>
+        <p>Submit attendance requests for workshops, events, and activities</p>
+        <div class="card-actions">
+            <a href="{{ url_for('student_login') }}" class="btn btn-primary">Login</a>
+            <a href="{{ url_for('student_register') }}" class="btn btn-secondary">Register</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">👨‍💼</div>
+        <h3>Coordinator Portal</h3>
+        <p>Review and approve student attendance requests</p>
+        <div class="card-actions">
+            <a href="{{ url_for('coordinator_login') }}" class="btn btn-primary">Login</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">👔</div>
+        <h3>HOD Portal</h3>
+        <p>Final approval for coordinator-approved requests</p>
+        <div class="card-actions">
+            <a href="{{ url_for('hod_login') }}" class="btn btn-primary">Login</a>
+        </div>
+    </div>
+</div>
+
+<div class="info-section">
+    <h2>📋 How It Works</h2>
+    <div class="workflow">
+        <div class="workflow-step">
+            <div class="step-number">1</div>
+            <h4>Student Submits</h4>
+            <p>Student fills and submits attendance request form</p>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+            <div class="step-number">2</div>
+            <h4>Coordinator Reviews</h4>
+            <p>Coordinator approves or rejects the request</p>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+            <div class="step-number">3</div>
+            <h4>HOD Finalizes</h4>
+            <p>HOD gives final approval or rejection</p>
+        </div>
+    </div>
+</div>
+
+<div class="features">
+    <h2>✨ Features</h2>
+    <ul>
+        <li>📝 Easy request submission with file attachments</li>
+        <li>🔄 Real-time status tracking</li>
+        <li>✅ Multi-level approval workflow</li>
+        <li>📊 Request history and analytics</li>
+        <li>🔐 Secure login for all users</li>
+    </ul>
+</div>
+{% endblock %}

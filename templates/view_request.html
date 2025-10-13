@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Request Details{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-header">
+        <h2>📄 Request Details</h2>
+        <span class="request-id">Request #{{ request.request_id }}</span>
+    </div>
+
+    <div class="detail-card">
+        <div class="detail-section">
+            <h3>Request Information</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Subject:</span>
+                    <span class="detail-value">{{ request.subject }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Status:</span>
+                    <span class="status-badge status-{{ request.status }}">
+                        {% if request.status == 'pending' %}
+                            ⏳ Pending with Coordinator
+                        {% elif request.status == 'approved_by_coordinator' %}
+                            🔄 Pending with HOD
+                        {% elif request.status == 'approved' %}
+                            ✅ Finally Approved
+                        {% elif request.status == 'rejected' %}
+                            ❌ Rejected
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="detail-item full-width">
+                    <span class="detail-label">Description:</span>
+                    <span class="detail-value">{{ request.description }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Student Information</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">{{ request.student_name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Department:</span>
+                    <span class="detail-value">{{ request.department }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ request.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Contact:</span>
+                    <span class="detail-value">{{ request.contact }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Date & Time</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Leave Date & Time:</span>
+                    <span class="detail-value">{{ request.start_time|datetime }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Return Date & Time:</span>
+                    <span class="detail-value">{{ request.end_time|datetime }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Submitted On:</span>
+                    <span class="detail-value">{{ request.created_at|datetime }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Updated:</span>
+                    <span class="detail-value">{{ request.updated_at|datetime }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if request.attachment_path %}
+        <div class="detail-section">
+            <h3>Attachment</h3>
+            <div class="attachment-box">
+                <div class="attachment-info">
+                    <span class="attachment-icon">📎</span>
+                    <span class="attachment-filename">
+                        {{ request.attachment_path.split('/')[-1] if '/' in request.attachment_path else request.attachment_path.split('\\')[-1] }}
+                    </span>
+                </div>
+                <a href="{{ url_for('view_attachment', request_id=request.request_id) }}" 
+                   class="btn btn-primary btn-sm" download>
+                    💾 Download Attachment
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if approvals %}
+        <div class="detail-section">
+            <h3>Approval History</h3>
+            <div class="timeline">
+                {% for approval in approvals %}
+                <div class="timeline-item">
+                    <div class="timeline-marker 
+                        {% if approval.decision == 'approved' %}timeline-approved{% else %}timeline-rejected{% endif %}">
+                        {% if approval.decision == 'approved' %}✓{% else %}✗{% endif %}
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <strong>{{ approval.approver_name }}</strong>
+                            <span class="timeline-role">({{ approval.approver_role|upper }})</span>
+                        </div>
+                        <div class="timeline-decision 
+                            {% if approval.decision == 'approved' %}decision-approved{% else %}decision-rejected{% endif %}">
+                            {{ approval.decision|upper }}
+                        </div>
+                        {% if approval.remarks %}
+                        <div class="timeline-remarks">
+                            💬 {{ approval.remarks }}
+                        </div>
+                        {% endif %}
+                        <div class="timeline-time">
+                            {{ approval.decision_time|datetime }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="detail-actions">
+        {% if session.get('role') == 'student' %}
+            <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% elif session.get('role') == 'coordinator' %}
+            <a href="{{ url_for('coordinator_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% elif session.get('role') == 'hod' %}
+            <a href="{{ url_for('hod_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

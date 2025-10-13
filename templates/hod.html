@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}HOD Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>🎯 Coordinator Approved Requests - Final Review</h2>
+    <div class="stats">
+        <div class="stat-item">
+            <span class="stat-number">{{ requests|length }}</span>
+            <span class="stat-label">Awaiting Review</span>
+        </div>
+    </div>
+</div>
+
+{% if requests %}
+<div class="requests-grid">
+    {% for req in requests %}
+    <div class="request-card">
+        <div class="request-header">
+            <h3>{{ req.subject }}</h3>
+            <span class="request-id">#{{ req.request_id }}</span>
+            <span class="status-badge status-approved_by_coordinator">✅ Coordinator Approved</span>
+        </div>
+        
+        <div class="request-body">
+            <div class="request-info">
+                <div class="info-row">
+                    <span class="label">👤 Student:</span>
+                    <span class="value">{{ req.student_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">🏫 Department:</span>
+                    <span class="value">{{ req.department }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">📧 Email:</span>
+                    <span class="value">{{ req.email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">📞 Contact:</span>
+                    <span class="value">{{ req.contact }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">📅 Leave:</span>
+                    <span class="value">{{ req.start_time|datetime }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">📅 Return:</span>
+                    <span class="value">{{ req.end_time|datetime }}</span>
+                </div>
+            </div>
+            
+            <div class="request-description">
+                <strong>Description:</strong>
+                <p>{{ req.description }}</p>
+            </div>
+
+            {% if req.attachment_path %}
+            <div class="attachment">
+                📎 Attachment: {{ req.attachment_path.split('/')[-1] }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="request-actions">
+            <form method="POST" action="{{ url_for('hod_action', request_id=req.request_id) }}" 
+                  style="display: inline;">
+                <input type="hidden" name="action" value="approve">
+                <div class="form-group-inline">
+                    <input type="text" name="remarks" placeholder="Add remarks (optional)" 
+                           class="remark-input">
+                    <button type="submit" class="btn btn-success" 
+                            onclick="return confirm('Give final approval?')">
+                        ✅ Final Approve
+                    </button>
+                </div>
+            </form>
+
+            <form method="POST" action="{{ url_for('hod_action', request_id=req.request_id) }}" 
+                  style="display: inline;">
+                <input type="hidden" name="action" value="reject">
+                <div class="form-group-inline">
+                    <input type="text" name="remarks" placeholder="Reason for rejection (optional)" 
+                           class="remark-input">
+                    <button type="submit" class="btn btn-danger" 
+                            onclick="return confirm('Reject this request?')">
+                        ❌ Reject
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="request-footer">
+            <small>Submitted: {{ req.created_at|datetime }}</small>
+            <a href="{{ url_for('view_request', request_id=req.request_id) }}" 
+               class="btn btn-sm btn-info">View Details</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">✅</div>
+    <h3>All Clear!</h3>
+    <p>No requests pending for final approval.</p>
+</div>
+{% endif %}
+{% endblock %}
