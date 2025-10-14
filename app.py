@@ -297,10 +297,12 @@ def view_attachment(request_id):
         flash('Attachment file not found on server', 'error')
         return redirect(url_for('view_request', request_id=request_id))
     
-    # Get filename for download
+    # Get filename and check if download is requested
     filename = os.path.basename(file_path)
+    download = request.args.get('download', 'false').lower() == 'true'
     
-    return send_file(file_path, as_attachment=True, download_name=filename)
+    # Send file for viewing in browser or download
+    return send_file(file_path, as_attachment=download, download_name=filename)
 
 
 @app.route('/all-requests')

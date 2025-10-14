@@ -176,7 +176,7 @@ pip install -r requirements.txt
 
 **Option A: Using MySQL Command Line**
 ```cmd
-mysql -u root -p < database\attendance_system.sql
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p < database\attendance_system.sql
 ```
 
 **Option B: Using MySQL Workbench**
@@ -207,6 +207,13 @@ The application will automatically create this, but you can do it manually:
 ```cmd
 mkdir uploads
 ```
+
+### Step 5.5: Venv
+```cmd
+python -m venv venv
+venv\Scripts\activate
+```
+
 
 ### Step 6: Run Application
 

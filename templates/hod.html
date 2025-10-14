@@ -14,87 +14,114 @@
 </div>
 
 {% if requests %}
-<div class="requests-grid">
+<div class="minimal-requests-container">
     {% for req in requests %}
-    <div class="request-card">
-        <div class="request-header">
-            <h3>{{ req.subject }}</h3>
-            <span class="request-id">#{{ req.request_id }}</span>
-            <span class="status-badge status-approved_by_coordinator">✅ Coordinator Approved</span>
-        </div>
-        
-        <div class="request-body">
-            <div class="request-info">
-                <div class="info-row">
-                    <span class="label">👤 Student:</span>
-                    <span class="value">{{ req.student_name }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">🏫 Department:</span>
-                    <span class="value">{{ req.department }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">📧 Email:</span>
-                    <span class="value">{{ req.email }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">📞 Contact:</span>
-                    <span class="value">{{ req.contact }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">📅 Leave:</span>
-                    <span class="value">{{ req.start_time|datetime }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">📅 Return:</span>
-                    <span class="value">{{ req.end_time|datetime }}</span>
+    <div class="minimal-request-card" id="request-{{ req.request_id }}">
+        <!-- Compact Summary View -->
+        <div class="minimal-summary">
+            <div class="summary-left">
+                <span class="request-id-badge">#{{ req.request_id }}</span>
+                <span class="coordinator-approved-badge">✅ Coordinator Approved</span>
+                <h3 class="request-subject">{{ req.subject }}</h3>
+                <div class="summary-meta">
+                    <span class="meta-item">👤 {{ req.student_name }}</span>
+                    <span class="meta-separator">•</span>
+                    <span class="meta-item">🏫 {{ req.department }}</span>
+                    <span class="meta-separator">•</span>
+                    <span class="meta-item">📅 {{ req.start_time|date }}</span>
                 </div>
             </div>
-            
-            <div class="request-description">
-                <strong>Description:</strong>
-                <p>{{ req.description }}</p>
+            <div class="summary-right">
+                <button class="btn-expand" onclick="toggleDetails({{ req.request_id }})">
+                    <span class="expand-text">View More Details</span>
+                    <span class="expand-icon">▼</span>
+                </button>
             </div>
-
-            {% if req.attachment_path %}
-            <div class="attachment">
-                📎 Attachment: {{ req.attachment_path.split('/')[-1] }}
-            </div>
-            {% endif %}
         </div>
 
-        <div class="request-actions">
-            <form method="POST" action="{{ url_for('hod_action', request_id=req.request_id) }}" 
-                  style="display: inline;">
-                <input type="hidden" name="action" value="approve">
-                <div class="form-group-inline">
-                    <input type="text" name="remarks" placeholder="Add remarks (optional)" 
-                           class="remark-input">
-                    <button type="submit" class="btn btn-success" 
-                            onclick="return confirm('Give final approval?')">
-                        ✅ Final Approve
-                    </button>
+        <!-- Expandable Details Section -->
+        <div class="minimal-details" id="details-{{ req.request_id }}" style="display: none;">
+            <div class="details-grid">
+                <div class="detail-section">
+                    <h4>📋 Request Information</h4>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{ req.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Contact:</span>
+                        <span class="detail-value">{{ req.contact }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Leave Start:</span>
+                        <span class="detail-value">{{ req.start_time|datetime }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Leave End:</span>
+                        <span class="detail-value">{{ req.end_time|datetime }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Submitted:</span>
+                        <span class="detail-value">{{ req.created_at|datetime }}</span>
+                    </div>
                 </div>
-            </form>
 
-            <form method="POST" action="{{ url_for('hod_action', request_id=req.request_id) }}" 
-                  style="display: inline;">
-                <input type="hidden" name="action" value="reject">
-                <div class="form-group-inline">
-                    <input type="text" name="remarks" placeholder="Reason for rejection (optional)" 
-                           class="remark-input">
-                    <button type="submit" class="btn btn-danger" 
-                            onclick="return confirm('Reject this request?')">
-                        ❌ Reject
-                    </button>
+                <div class="detail-section">
+                    <h4>📝 Description</h4>
+                    <p class="description-text">{{ req.description }}</p>
                 </div>
-            </form>
-        </div>
 
-        <div class="request-footer">
-            <small>Submitted: {{ req.created_at|datetime }}</small>
-            <a href="{{ url_for('view_request', request_id=req.request_id) }}" 
-               class="btn btn-sm btn-info">View Details</a>
+                {% if req.attachment_path %}
+                <div class="detail-section attachment-section">
+                    <h4>📎 Attachment</h4>
+                    <div class="attachment-preview">
+                        <div class="attachment-name">{{ req.attachment_path.split('/')[-1].split('\\')[-1] }}</div>
+                        <div class="attachment-actions">
+                            <a href="{{ url_for('view_attachment', request_id=req.request_id) }}" 
+                               target="_blank" 
+                               class="btn btn-sm btn-view">
+                                👁️ View in Browser
+                            </a>
+                            <a href="{{ url_for('view_attachment', request_id=req.request_id, download='true') }}" 
+                               class="btn btn-sm btn-download">
+                                💾 Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="minimal-actions">
+                <form method="POST" action="{{ url_for('hod_action', request_id=req.request_id) }}" 
+                      class="action-form" onsubmit="return confirm('Give final approval to this request?')">
+                    <input type="hidden" name="action" value="approve">
+                    <div class="action-group">
+                        <input type="text" 
+                               name="remarks" 
+                               placeholder="Add remarks (optional)" 
+                               class="remarks-input">
+                        <button type="submit" class="btn btn-approve">
+                            ✅ Final Approve
+                        </button>
+                    </div>
+                </form>
+
+                <form method="POST" action="{{ url_for('hod_action', request_id=req.request_id) }}" 
+                      class="action-form" onsubmit="return confirm('Reject this request?')">
+                    <input type="hidden" name="action" value="reject">
+                    <div class="action-group">
+                        <input type="text" 
+                               name="remarks" 
+                               placeholder="Reason for rejection (recommended)" 
+                               class="remarks-input">
+                        <button type="submit" class="btn btn-reject">
+                            ❌ Reject Request
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     {% endfor %}
@@ -106,4 +133,25 @@
     <p>No requests pending for final approval.</p>
 </div>
 {% endif %}
+
+<script>
+function toggleDetails(requestId) {
+    const detailsDiv = document.getElementById('details-' + requestId);
+    const button = document.querySelector('#request-' + requestId + ' .btn-expand');
+    const expandText = button.querySelector('.expand-text');
+    const expandIcon = button.querySelector('.expand-icon');
+    
+    if (detailsDiv.style.display === 'none') {
+        detailsDiv.style.display = 'block';
+        expandText.textContent = 'Hide Details';
+        expandIcon.textContent = '▲';
+        button.classList.add('expanded');
+    } else {
+        detailsDiv.style.display = 'none';
+        expandText.textContent = 'View More Details';
+        expandIcon.textContent = '▼';
+        button.classList.remove('expanded');
+    }
+}
+</script>
 {% endblock %}
