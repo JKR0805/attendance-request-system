@@ -72,3 +72,4 @@ pythonanywhere_schema.sql
 PYTHONANYWHERE_CONFIG_TEMPLATE.txt
 DEPLOYMENT_PACKAGE_README.md
 PYTHONANYWHERE_VISUAL_GUIDE.md
+wsgi_pythonanywhere.py
